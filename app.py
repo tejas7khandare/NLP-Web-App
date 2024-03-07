@@ -108,7 +108,7 @@ def main():
             st.markdown(f"<p style='color: #008080;'>{result_summary}</p>", unsafe_allow_html=True)
 
     elif choice == "Named Entity Recognition":
-        nlp = spacy.load("en_core_web_trf")
+        nlp = spacy.load("en_core_web_sm")
         st.subheader("Named Entity Recognition 🏷️")
         st.write(" Enter the Text below To extract Named Entities !")
 
