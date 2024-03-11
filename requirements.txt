@@ -4,3 +4,4 @@ stqdm==0.0.5
 streamlit==1.31.1
 transformers==4.38.2
 https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1.tar.gz
+tensorflow==2.15.0
