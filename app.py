@@ -2,7 +2,7 @@ import streamlit as st
 from time import sleep
 from stqdm import stqdm  # for getting animation after submit event
 
-from transformers import pipeline, AutoModelForQuestionAnswering, AutoTokenizer, AutoModelForSequenceClassification
+from transformers import pipeline, TFAutoModelForQuestionAnswering, AutoTokenizer, TFAutoModelForSequenceClassification
 import json
 import spacy
 import spacy_streamlit
@@ -151,7 +151,7 @@ def main():
         model_name = 'nlptown/bert-base-multilingual-uncased-sentiment'
 
         # Download the sentiment analysis model
-        sentiment_analysis_model = AutoModelForSequenceClassification.from_pretrained(model_name)
+        sentiment_analysis_model = TFAutoModelForSequenceClassification.from_pretrained(model_name)
         sentiment_analysis_tokenizer = AutoTokenizer.from_pretrained(model_name)
 
         # Use the pipeline with the downloaded model and tokenizer
@@ -192,7 +192,7 @@ def main():
         model_name = 'distilbert-base-cased-distilled-squad'
 
         # Download the model and tokenizer
-        question_answering_model = AutoModelForQuestionAnswering.from_pretrained(model_name)
+        question_answering_model = TFAutoModelForSequenceClassification.from_pretrained(model_name)
         question_answering_tokenizer = AutoTokenizer.from_pretrained(model_name)
 
         # Use the pipeline with the downloaded model and tokenizer
