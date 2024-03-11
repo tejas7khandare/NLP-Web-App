@@ -125,17 +125,33 @@ def main():
         st.write(" Enter the Text below To find out its Sentiment !")
 
         raw_text = st.text_area("Enter Text Here")
-        if raw_text.strip() != "":
-            result = sentiment_analysis(raw_text)[0]
-            sentiment = result['label']
-            for _ in stqdm(range(50), desc="Analyzing sentiment..."):
-                sleep(0.1)
-            if sentiment == "POSITIVE":
-                st.markdown('<h2 style="color: green; font-size: 28px;"> Positive 😊</h2>', unsafe_allow_html=True)
-            elif sentiment == "NEGATIVE":
-                st.markdown('<h2 style="color: red; font-size: 28px;"> Negative 😞</h2>', unsafe_allow_html=True)
-            elif sentiment == "NEUTRAL":
-                st.markdown('<h2 style="font-size: 28px;"> Neutral 😐</h2>', unsafe_allow_html=True)
+        # if raw_text.strip() != "":
+        #     result = sentiment_analysis(raw_text)[0]
+        #     sentiment = result['label']
+        #     for _ in stqdm(range(50), desc="Analyzing sentiment..."):
+        #         sleep(0.1)
+        #     if sentiment == "POSITIVE":
+        #         st.markdown('<h2 style="color: green; font-size: 28px;"> Positive 😊</h2>', unsafe_allow_html=True)
+        #     elif sentiment == "NEGATIVE":
+        #         st.markdown('<h2 style="color: red; font-size: 28px;"> Negative 😞</h2>', unsafe_allow_html=True)
+        #     elif sentiment == "NEUTRAL":
+        #         st.markdown('<h2 style="font-size: 28px;"> Neutral 😐</h2>', unsafe_allow_html=True)
+
+        threshold = 0.7  # Adjust this threshold as needed
+
+        result = sentiment_analysis(raw_text)[0]
+        sentiment = result['label']
+        score = result['score']
+
+        for _ in stqdm(range(50), desc="Analyzing sentiment..."):
+            sleep(0.1)
+
+        if sentiment == "POSITIVE" and score >= threshold:
+            st.markdown('<h2 style="color: green; font-size: 28px;"> Positive 😊</h2>', unsafe_allow_html=True)
+        elif sentiment == "NEGATIVE" and score >= threshold:
+            st.markdown('<h2 style="color: red; font-size: 28px;"> Negative 😞</h2>', unsafe_allow_html=True)
+        else:
+            st.markdown('<h2 style="font-size: 28px;"> Neutral 😐</h2>', unsafe_allow_html=True)
 
     elif choice == "Question Answering":
         st.subheader("Question Answering 🧩")
