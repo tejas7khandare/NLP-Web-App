@@ -2,7 +2,7 @@ import streamlit as st
 from time import sleep
 from stqdm import stqdm  # for getting animation after submit event
 
-from transformers import pipeline
+from transformers import pipeline, AutoModelForQuestionAnswering, AutoTokenizer, AutoModelForSequenceClassification
 import json
 import spacy
 import spacy_streamlit
@@ -119,13 +119,60 @@ def main():
                 sleep(0.1)
             spacy_streamlit.visualize_ner(doc, labels=nlp.get_pipe("ner").labels, title="List of Entities")
 
+    # elif choice == "Sentiment Analysis":
+    #     st.subheader("Sentiment Analysis 🎭")
+    #     sentiment_analysis = pipeline("sentiment-analysis")
+    #     st.write(" Enter the Text below To find out its Sentiment !")
+    #
+    #     raw_text = st.text_area("Enter Text Here")
+    #     if raw_text.strip() != "":
+    #
+    #         threshold = 0.7  # Adjust this threshold as needed
+    #
+    #         result = sentiment_analysis(raw_text)[0]
+    #         sentiment = result['label']
+    #         score = result['score']
+    #
+    #         for _ in stqdm(range(50), desc="Analyzing sentiment..."):
+    #             sleep(0.1)
+    #
+    #         if sentiment == "POSITIVE" and score >= threshold:
+    #             st.markdown('<h2 style="color: green; font-size: 28px;"> Positive 😊</h2>', unsafe_allow_html=True)
+    #         elif sentiment == "NEGATIVE" and score >= threshold:
+    #             st.markdown('<h2 style="color: red; font-size: 28px;"> Negative 😞</h2>', unsafe_allow_html=True)
+    #         else:
+    #             st.markdown('<h2 style="font-size: 28px;"> Neutral 😐</h2>', unsafe_allow_html=True)
+
     elif choice == "Sentiment Analysis":
         st.subheader("Sentiment Analysis 🎭")
-        sentiment_analysis = pipeline("sentiment-analysis")
         st.write(" Enter the Text below To find out its Sentiment !")
 
+        # Replace 'nlptown/bert-base-multilingual-uncased-sentiment' with the model you want to use
+        model_name = 'nlptown/bert-base-multilingual-uncased-sentiment'
+
+        # Download the sentiment analysis model
+        sentiment_analysis_model = AutoModelForSequenceClassification.from_pretrained(model_name)
+        sentiment_analysis_tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+        # Use the pipeline with the downloaded model and tokenizer
+        sentiment_analysis = pipeline("sentiment-analysis", model=sentiment_analysis_model,
+                                      tokenizer=sentiment_analysis_tokenizer)
+
         raw_text = st.text_area("Enter Text Here")
-        # if raw_text.strip() != "":
+        if raw_text.strip() != "":
+            threshold = 0.7  # Adjust this threshold as needed
+
+            result = sentiment_analysis(raw_text)[0]
+            sentiment = result['label']
+            score = result['score']
+
+            if sentiment == "POSITIVE" and score >= threshold:
+                st.markdown('<h2 style="color: green; font-size: 28px;"> Positive 😊</h2>', unsafe_allow_html=True)
+            elif sentiment == "NEGATIVE" and score >= threshold:
+                st.markdown('<h2 style="color: red; font-size: 28px;"> Negative 😞</h2>', unsafe_allow_html=True)
+            else:
+                st.markdown('<h2 style="font-size: 28px;"> Neutral 😐</h2>', unsafe_allow_html=True)
+
         #     result = sentiment_analysis(raw_text)[0]
         #     sentiment = result['label']
         #     for _ in stqdm(range(50), desc="Analyzing sentiment..."):
@@ -137,40 +184,49 @@ def main():
         #     elif sentiment == "NEUTRAL":
         #         st.markdown('<h2 style="font-size: 28px;"> Neutral 😐</h2>', unsafe_allow_html=True)
 
-        threshold = 0.7  # Adjust this threshold as needed
-
-        result = sentiment_analysis(raw_text)[0]
-        sentiment = result['label']
-        score = result['score']
-
-        for _ in stqdm(range(50), desc="Analyzing sentiment..."):
-            sleep(0.1)
-
-        if sentiment == "POSITIVE" and score >= threshold:
-            st.markdown('<h2 style="color: green; font-size: 28px;"> Positive 😊</h2>', unsafe_allow_html=True)
-        elif sentiment == "NEGATIVE" and score >= threshold:
-            st.markdown('<h2 style="color: red; font-size: 28px;"> Negative 😞</h2>', unsafe_allow_html=True)
-        else:
-            st.markdown('<h2 style="font-size: 28px;"> Neutral 😐</h2>', unsafe_allow_html=True)
-
     elif choice == "Question Answering":
         st.subheader("Question Answering 🧩")
         st.write(" Enter the Context and ask the Question to find out the Answer !")
-        question_answering = pipeline("question-answering")
+
+        # Replace 'distilbert-base-cased-distilled-squad' with the model you want to use
+        model_name = 'distilbert-base-cased-distilled-squad'
+
+        # Download the model and tokenizer
+        question_answering_model = AutoModelForQuestionAnswering.from_pretrained(model_name)
+        question_answering_tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+        # Use the pipeline with the downloaded model and tokenizer
+        question_answering = pipeline("question-answering", model=question_answering_model,
+                                      tokenizer=question_answering_tokenizer)
 
         context = st.text_area("Enter the Context Here")
-
         question = st.text_area("Enter your Question Here")
 
         if context.strip() != "" and question.strip() != "":
             result = question_answering(question=question, context=context)
-            s1 = json.dumps(result)
-            d2 = json.loads(s1)
-            generated_text = d2['answer']
+            generated_text = result['answer']
             generated_text = '. '.join(list(map(lambda x: x.strip().capitalize(), generated_text.split('.'))))
-            # st.write(f" Here's your Answer: {generated_text}")
             st.write(f"Here's your Answer:")
             st.markdown(f"<p style='color: #008080;'>{generated_text}</p>", unsafe_allow_html=True)
+
+    # elif choice == "Question Answering":
+    #     st.subheader("Question Answering 🧩")
+    #     st.write(" Enter the Context and ask the Question to find out the Answer !")
+    #     question_answering = pipeline("question-answering")
+    #
+    #     context = st.text_area("Enter the Context Here")
+    #
+    #     question = st.text_area("Enter your Question Here")
+    #
+    #     if context.strip() != "" and question.strip() != "":
+    #         result = question_answering(question=question, context=context)
+    #         s1 = json.dumps(result)
+    #         d2 = json.loads(s1)
+    #         generated_text = d2['answer']
+    #         generated_text = '. '.join(list(map(lambda x: x.strip().capitalize(), generated_text.split('.'))))
+    #         # st.write(f" Here's your Answer: {generated_text}")
+    #         st.write(f"Here's your Answer:")
+    #         st.markdown(f"<p style='color: #008080;'>{generated_text}</p>", unsafe_allow_html=True)
 
     # elif choice == "Text Completion":
     #     st.subheader("Text Completion")
